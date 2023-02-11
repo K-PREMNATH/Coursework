@@ -77,7 +77,7 @@ CREATE TABLE `customer` (
   PRIMARY KEY (`CustomerId`),
   KEY `userfk_idx` (`UserId`),
   CONSTRAINT `userfk` FOREIGN KEY (`UserId`) REFERENCES `user` (`UserId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -86,6 +86,7 @@ CREATE TABLE `customer` (
 
 LOCK TABLES `customer` WRITE;
 /*!40000 ALTER TABLE `customer` DISABLE KEYS */;
+INSERT INTO `customer` VALUES (1,15000,0,1,2);
 /*!40000 ALTER TABLE `customer` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -125,7 +126,7 @@ CREATE TABLE `installmentplan` (
   `InstallmentPlanId` int NOT NULL AUTO_INCREMENT,
   `PlanName` varchar(100) NOT NULL,
   PRIMARY KEY (`InstallmentPlanId`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -134,6 +135,7 @@ CREATE TABLE `installmentplan` (
 
 LOCK TABLES `installmentplan` WRITE;
 /*!40000 ALTER TABLE `installmentplan` DISABLE KEYS */;
+INSERT INTO `installmentplan` VALUES (1,'1000-5000-5000');
 /*!40000 ALTER TABLE `installmentplan` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -253,9 +255,12 @@ CREATE TABLE `user` (
   `Secretkey` varchar(100) NOT NULL,
   `CreatedOn` timestamp NULL DEFAULT NULL,
   `UpdatedOn` timestamp NULL DEFAULT NULL,
+  `UserEmail` varchar(45) NOT NULL,
+  `UserMobileNumber` varchar(10) NOT NULL,
+  `NIC` varchar(20) NOT NULL,
   PRIMARY KEY (`UserId`),
   UNIQUE KEY `Username_UNIQUE` (`Username`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -264,8 +269,102 @@ CREATE TABLE `user` (
 
 LOCK TABLES `user` WRITE;
 /*!40000 ALTER TABLE `user` DISABLE KEYS */;
+INSERT INTO `user` VALUES (1,'Kathirkamanathan','Premnath','05-03-1991',1,'kpremnath','12345','2023-02-11 11:15:38',NULL,'rexprem1991@gmail.com','',''),(2,'Sivanath','Kumara','05-03-1991',2,'p1991','12345','2023-02-11 11:16:39',NULL,'','','');
 /*!40000 ALTER TABLE `user` ENABLE KEYS */;
 UNLOCK TABLES;
+
+--
+-- Dumping routines for database 'loanoffersystem'
+--
+/*!50003 DROP PROCEDURE IF EXISTS `insert_update_admin_customer` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `insert_update_admin_customer`(IN puserid int, IN pfirstname varchar(50), IN plastname varchar(50),
+                                                IN pdateofbirth varchar(20), IN pusertype int, IN pusername varchar(30),
+                                                IN psecretkey varchar(100), IN puseremail varchar(45),
+                                                IN pusermobilenumber varchar(45), IN pnic varchar(45),
+                                                IN pcustomerid int, IN ploanbalance DOUBLE, IN pusedamount DOUBLE,
+                                                IN pinstallmentplan int, out rres tinyint(1), out rstatuscode int,
+                                                out rmsg varchar(50))
+BEGIN
+    DECLARE luserid INTEGER default 0;
+    DECLARE lcount INTEGER default 0;
+    SET rres := true;
+    SET rstatuscode := 3000;#success status code
+    SET rmsg := 'Success';
+    IF puseremail IS NULL
+        OR
+       puseremail = '' then
+        SET rres := false;SET rstatuscode := 3001;#invalid information
+        SET rmsg := 'Incorrect Email Address';
+    ELSE
+        SELECT Count(*)
+        INTO lcount
+        FROM USER
+        WHERE useremail = puseremail;
+        IF lcount > 0 then
+            SET rres := false;SET rstatuscode := 3002;#already registered
+            SET rmsg := 'User Already Registered...!';
+        ELSE
+            IF puserid = 0 then
+                INSERT INTO USER
+                (firstname,
+                 lastname,
+                 dateofbirth,
+                 usertype,
+                 username,
+                 secretkey,
+                 useremail,
+                 usermobilenumber,
+                 nic,
+                 createdon)
+                VALUES (pfirstname,
+                        plastname,
+                        pdateofbirth,
+                        pusertype,
+                        pusername,
+                        psecretkey,
+                        puseremail,
+                        pusermobilenumber,
+                        pnic,
+                        now());
+                SELECT Last_insert_id()
+                INTO luserid;
+                IF pusertype = 2 then
+                    INSERT INTO customer
+                    (loanbalance,
+                     usedamount,
+                     installmentplan,
+                     userid)
+                    VALUES (ploanbalance,
+                            pusedamount,
+                            pinstallmentplan,
+                            luserid);
+                END IF;
+            ELSE
+                UPDATE USER
+                SET firstname   = pfirstname,
+                    lastname    = plastname,
+                    dateofbirth = pdateofbirth,
+                    updatedon   = now()
+                WHERE userid = puserid;
+            END IF;
+        END IF;
+    END IF;
+
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -276,4 +375,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-02-11 16:02:43
+-- Dump completed on 2023-02-11 17:17:50
