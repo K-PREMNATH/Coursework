@@ -1,0 +1,40 @@
+{
+	"info": {
+		"_postman_id": "f94bcf75-9948-468d-ad12-19be459573c5",
+		"name": "Coursework",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "22489993"
+	},
+	"item": [
+		{
+			"name": "http://localhost:8080/create/new/user",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"userId\": 0,\r\n    \"firstName\": \"TestFirst\",\r\n    \"lastName\": \"TestLast\",\r\n    \"dob\": \"01-01-2010\",\r\n    \"userType\": 2,\r\n    \"userName\": \"useradmin2\",\r\n    \"secretKey\": \"37427346\",\r\n    \"userEmail\": \"useradmin2@gmail.com\",\r\n    \"userMobileNumber\": \"3423423\",\r\n    \"nic\": \"354334\",\r\n    \"customerId\": 0,\r\n    \"loanBalance\": 15000,\r\n    \"usedAmount\": 0,\r\n    \"installPlan\": 1\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/create/new/user",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"create",
+						"new",
+						"user"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
