@@ -2,6 +2,7 @@ package com.controller;
 
 import com.dto.response.LoanOfferResponse;
 import com.dto.user.request.CreateNewUserReq;
+import com.dto.user.request.GetCustomerDetailReq;
 
 public interface UserController {
 
@@ -11,4 +12,17 @@ public interface UserController {
      * @return
      */
     public LoanOfferResponse createNewUser(CreateNewUserReq createNewUserReq);
+
+    /**
+     * getCustomerDetail
+     * @param getCustomerDetailReq
+     * @return
+     */
+    public LoanOfferResponse getCustomerDetail(GetCustomerDetailReq getCustomerDetailReq);
+
+    /**
+     * getCustomerList
+     * @return
+     */
+    public LoanOfferResponse getCustomerList();
 }

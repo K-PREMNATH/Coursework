@@ -3,6 +3,10 @@ package com.dao;
 import com.dto.response.GeneralResponse;
 import com.dto.response.LoanOfferResponse;
 import com.dto.user.request.CreateNewUserReq;
+import com.dto.user.request.GetCustomerDetailReq;
+import com.dto.user.response.CustomerRes;
+
+import java.util.List;
 
 public interface UserDAO {
     /**
@@ -11,4 +15,17 @@ public interface UserDAO {
      * @return
      */
     GeneralResponse createNewUser(CreateNewUserReq createNewUserReq);
+
+    /**
+     * getCustomerDetail
+     * @param getCustomerDetailReq
+     * @return
+     */
+    CustomerRes getCustomerDetail(GetCustomerDetailReq getCustomerDetailReq);
+
+    /**
+     * getCustomerList
+     * @return
+     */
+    List<CustomerRes> getCustomerList();
 }
