@@ -1,5 +1,7 @@
 package com.business;
 
+import com.dto.request.UserLoginReq;
+import com.dto.response.CommonResponse;
 import com.dto.response.GeneralResponse;
 import com.dto.response.LoanOfferResponse;
 import com.dto.user.request.CreateNewUserReq;
@@ -28,4 +30,11 @@ public interface UserBusiness {
      * @return
      */
     List<CustomerRes> getCustomerList();
+
+    /**
+     * login
+     * @param loginReq
+     * @return
+     */
+    CommonResponse login(UserLoginReq loginReq);
 }

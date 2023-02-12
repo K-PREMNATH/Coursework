@@ -7,5 +7,7 @@ public class OfferDAOConstant {
         String GET_CUSTOMER_DETAIL = "{call get_customer_detail(?)}";
 
         String GET_CUSTOMER_LIST = "{call get_customer_list()}";
+
+        String LOGIN_USER = "{call user_login(?,?,?,?,?,?,?,?,?)}";
     }
 }

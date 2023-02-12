@@ -1,5 +1,6 @@
 package com.controller;
 
+import com.dto.request.UserLoginReq;
 import com.dto.response.LoanOfferResponse;
 import com.dto.user.request.CreateNewUserReq;
 import com.dto.user.request.GetCustomerDetailReq;
@@ -25,4 +26,6 @@ public interface UserController {
      * @return
      */
     public LoanOfferResponse getCustomerList();
+
+    public LoanOfferResponse login(UserLoginReq loginReq);
 }

@@ -2,10 +2,14 @@ package com.dao.impl;
 
 import com.dao.OfferDAOConstant;
 import com.dao.UserDAO;
+import com.dto.request.UserLoginReq;
+import com.dto.response.CommonResponse;
 import com.dto.response.GeneralResponse;
+import com.dto.response.UserLoginRes;
 import com.dto.user.request.CreateNewUserReq;
 import com.dto.user.request.GetCustomerDetailReq;
 import com.dto.user.response.CustomerRes;
+import com.util.HashUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceUtils;
@@ -41,7 +45,7 @@ public class UserDAOImpl implements UserDAO {
             callableStatement.setObject(4,createNewUserReq.getDob(),Types.VARCHAR);
             callableStatement.setObject(5,createNewUserReq.getUserType(),Types.INTEGER);
             callableStatement.setObject(6,createNewUserReq.getUserName(),Types.VARCHAR);
-            callableStatement.setObject(7,createNewUserReq.getSecretKey(),Types.VARCHAR);
+            callableStatement.setObject(7, HashUtil.getHashCode(createNewUserReq.getSecretKey()),Types.VARCHAR);
             callableStatement.setObject(8,createNewUserReq.getUserEmail(),Types.VARCHAR);
             callableStatement.setObject(9,createNewUserReq.getUserMobileNumber(),Types.VARCHAR);
             callableStatement.setObject(10,createNewUserReq.getNic(),Types.VARCHAR);
@@ -140,5 +144,49 @@ public class UserDAOImpl implements UserDAO {
             logger.info("Time taken for getCustomerList in seconds: "+ (double)(System.currentTimeMillis() - startTime)/1000 );
         }
         return list;
+    }
+
+    @Override
+    public CommonResponse login(UserLoginReq loginReq) {
+        Long startTime = System.currentTimeMillis();
+        CommonResponse response = new CommonResponse();
+        Connection connection = null;
+        CallableStatement callableStatement;
+        try {
+            logger.info("login-request------------------>"+loginReq.toString());
+
+            connection = DataSourceUtils.getConnection(jdbcTemplate.getDataSource());
+            callableStatement = connection.prepareCall(OfferDAOConstant.UserConstant.LOGIN_USER);
+            callableStatement.setObject(1,loginReq.getUsername(),Types.VARCHAR);
+            callableStatement.setObject(2,HashUtil.getHashCode(loginReq.getPassword()),Types.VARCHAR);
+            callableStatement.registerOutParameter(3,Types.INTEGER);
+            callableStatement.registerOutParameter(4,Types.INTEGER);
+            callableStatement.registerOutParameter(5,Types.VARCHAR);
+            callableStatement.registerOutParameter(6,Types.VARCHAR);
+            callableStatement.registerOutParameter(7,Types.BOOLEAN);
+            callableStatement.registerOutParameter(8,Types.INTEGER);
+            callableStatement.registerOutParameter(9,Types.VARCHAR);
+            callableStatement.execute();
+            callableStatement.getResultSet();
+
+            response.setRes((Boolean) callableStatement.getObject(7));
+            response.setStatusCode((Integer) callableStatement.getObject(8));
+            response.setMsg((String) callableStatement.getObject(9));
+            if(response.isRes()){
+                UserLoginRes loginRes = new UserLoginRes();
+                loginRes.setFirstName( callableStatement.getString(3));
+                loginRes.setLastName( callableStatement.getString(4));
+                loginRes.setUserType( callableStatement.getInt(5));
+                loginRes.setUserId( callableStatement.getInt(6));
+
+                response.setValue(loginRes);
+            }
+        }catch (SQLException exception){
+            logger.info("An error occured in login "+exception.toString());
+        }finally {
+            DataSourceUtils.releaseConnection(connection,jdbcTemplate.getDataSource());
+            logger.info("Time taken for login in seconds: "+ (double)(System.currentTimeMillis() - startTime)/1000 );
+        }
+        return response;
     }
 }

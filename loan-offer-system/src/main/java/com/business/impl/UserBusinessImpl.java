@@ -2,6 +2,8 @@ package com.business.impl;
 
 import com.business.UserBusiness;
 import com.dao.UserDAO;
+import com.dto.request.UserLoginReq;
+import com.dto.response.CommonResponse;
 import com.dto.response.GeneralResponse;
 import com.dto.user.request.CreateNewUserReq;
 import com.dto.user.request.GetCustomerDetailReq;
@@ -30,5 +32,10 @@ public class UserBusinessImpl implements UserBusiness {
     @Override
     public List<CustomerRes> getCustomerList() {
         return userDAO.getCustomerList();
+    }
+
+    @Override
+    public CommonResponse login(UserLoginReq loginReq) {
+        return userDAO.login(loginReq);
     }
 }

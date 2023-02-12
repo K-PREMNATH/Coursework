@@ -1,5 +1,7 @@
 package com.dao;
 
+import com.dto.request.UserLoginReq;
+import com.dto.response.CommonResponse;
 import com.dto.response.GeneralResponse;
 import com.dto.response.LoanOfferResponse;
 import com.dto.user.request.CreateNewUserReq;
@@ -28,4 +30,6 @@ public interface UserDAO {
      * @return
      */
     List<CustomerRes> getCustomerList();
+
+    CommonResponse login(UserLoginReq loginReq);
 }

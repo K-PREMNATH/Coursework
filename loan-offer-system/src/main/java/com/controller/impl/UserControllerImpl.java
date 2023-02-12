@@ -2,6 +2,8 @@ package com.controller.impl;
 
 import com.business.UserBusiness;
 import com.controller.UserController;
+import com.dto.request.UserLoginReq;
+import com.dto.response.CommonResponse;
 import com.dto.response.GeneralResponse;
 import com.dto.response.LoanOfferResponse;
 import com.dto.user.request.CreateNewUserReq;
@@ -46,5 +48,15 @@ public class UserControllerImpl implements UserController {
                 customerResList,
                 ApplicationConstant.SuccessStatusCode,
                 ApplicationConstant.SuccessMsg);
+    }
+
+    @Override
+    @PostMapping("/user/login")
+    public LoanOfferResponse login(@RequestBody UserLoginReq loginReq) {
+        CommonResponse commonResponse = userBusiness.login(loginReq);
+        return LoanOfferResponse.generateResponse(
+                commonResponse.getValue(),
+                commonResponse.getStatusCode(),
+                commonResponse.getMsg());
     }
 }

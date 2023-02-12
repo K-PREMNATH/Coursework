@@ -77,7 +77,7 @@ CREATE TABLE `customer` (
   PRIMARY KEY (`CustomerId`),
   KEY `userfk_idx` (`UserId`),
   CONSTRAINT `userfk` FOREIGN KEY (`UserId`) REFERENCES `user` (`UserId`)
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -86,7 +86,7 @@ CREATE TABLE `customer` (
 
 LOCK TABLES `customer` WRITE;
 /*!40000 ALTER TABLE `customer` DISABLE KEYS */;
-INSERT INTO `customer` VALUES (1,15000,0,1,2),(2,10000,5000,2,3),(3,5000,10000,1,4),(4,2000,13000,2,5);
+INSERT INTO `customer` VALUES (1,15000,0,1,2),(2,10000,5000,2,3),(3,5000,10000,1,4),(4,2000,13000,2,5),(5,15000,0,1,7),(6,15000,0,1,8);
 /*!40000 ALTER TABLE `customer` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -260,7 +260,7 @@ CREATE TABLE `user` (
   `NIC` varchar(20) NOT NULL,
   PRIMARY KEY (`UserId`),
   UNIQUE KEY `Username_UNIQUE` (`Username`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -269,7 +269,7 @@ CREATE TABLE `user` (
 
 LOCK TABLES `user` WRITE;
 /*!40000 ALTER TABLE `user` DISABLE KEYS */;
-INSERT INTO `user` VALUES (1,'Kathirkamanathan','Premnath','05-03-1991',1,'kpremnath','12345','2023-02-11 11:15:38',NULL,'rexprem1991@gmail.com','0772863745','90167883V'),(2,'Sivanath','Kumara','05-03-1991',2,'p1991','12345','2023-02-11 11:16:39',NULL,'kumara@kum.com','0772863745','90167883V'),(3,'Kamal','Darazx','05-03-1992',2,'srtwe','dfsdfs',NULL,NULL,'abc@pk.com','0772863745','90167883V'),(4,'Samal','Andros','05-03-1993',2,'dsssd','dfdsfsdfsd',NULL,NULL,'abcd@pk.com','0772863745','90167883V'),(5,'Dameel','Muru','05-03-1994',2,'dsfsd','fdsfsdfsdsd',NULL,NULL,'abcde@pk.com','0772863745','90167883V');
+INSERT INTO `user` VALUES (1,'Kathirkamanathan','Premnath','05-03-1991',1,'kpremnath','12345','2023-02-11 11:15:38',NULL,'rexprem1991@gmail.com','0772863745','90167883V'),(2,'Sivanath','Kumara','05-03-1991',2,'p1991','12345','2023-02-11 11:16:39',NULL,'kumara@kum.com','0772863745','90167883V'),(3,'Kamal','Darazx','05-03-1992',2,'srtwe','dfsdfs',NULL,NULL,'abc@pk.com','0772863745','90167883V'),(4,'Samal','Andros','05-03-1993',2,'dsssd','dfdsfsdfsd',NULL,NULL,'abcd@pk.com','0772863745','90167883V'),(5,'Dameel','Muru','05-03-1994',2,'dsfsd','fdsfsdfsdsd',NULL,NULL,'abcde@pk.com','0772863745','90167883V'),(6,'TestFirst','TestLast','01-01-2010',1,'useradmin1','37427346','2023-02-12 05:27:30',NULL,'useradmin1@gmail.com','3423423','354334'),(7,'TestFirst','TestLast','01-01-2010',2,'useradmin2','37427346','2023-02-12 05:32:54',NULL,'useradmin2@gmail.com','3423423','354334'),(8,'TestFirst','TestLast','01-01-2010',2,'useradmin3','37427346','2023-02-12 06:08:36',NULL,'useradmin3@gmail.com','3423423','354334'),(9,'TestFirst','TestLast','01-01-2010',1,'useradmin4','5994471abb1112afcc18159f6cc74b4f511b9986da59b3caf5a9c173cacfc5','2023-02-12 06:45:24',NULL,'useradmin4@gmail.com','3423423','354334');
 /*!40000 ALTER TABLE `user` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -503,6 +503,41 @@ DELIMITER ;
 /*!50003 SET character_set_client  = @saved_cs_client */ ;
 /*!50003 SET character_set_results = @saved_cs_results */ ;
 /*!50003 SET collation_connection  = @saved_col_connection */ ;
+/*!50003 DROP PROCEDURE IF EXISTS `user_login` */;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8mb4 */ ;
+/*!50003 SET character_set_results = utf8mb4 */ ;
+/*!50003 SET collation_connection  = utf8mb4_0900_ai_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+CREATE DEFINER=`root`@`localhost` PROCEDURE `user_login`(IN pusername varchar(50),IN ppasscode varchar(100),
+OUT rfirstname varchar(50), OUT rlastname varchar(50), OUT rusertype int,  OUT ruserid int,out rres tinyint(1), out rstatuscode int,
+                                                out rmsg varchar(50))
+BEGIN
+	declare lCount integer default 0;
+	SET rres := true;
+    SET rstatuscode := 3000;#success status code
+    SET rmsg := 'Success';
+    
+    select count(*)  into lCount from user where username = pusername and secretkey = ppasscode;
+    if lCount > 0 then
+		select firstname,lastname,usertype,userid into
+        rfirstname,rlastname,rusertype,ruserid
+        from user where username = pusername and secretkey = ppasscode;
+        else
+        SET rres := false;
+    SET rstatuscode := 3003;
+    SET rmsg := 'Invalid Username or Password...!';
+    end if;
+END ;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -513,4 +548,4 @@ DELIMITER ;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2023-02-12  9:54:29
+-- Dump completed on 2023-02-12 12:19:51
