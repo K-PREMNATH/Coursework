@@ -31,5 +31,10 @@ public interface UserDAO {
      */
     List<CustomerRes> getCustomerList();
 
+    /**
+     * login
+     * @param loginReq
+     * @return
+     */
     CommonResponse login(UserLoginReq loginReq);
 }

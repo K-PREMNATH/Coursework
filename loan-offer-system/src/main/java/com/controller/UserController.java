@@ -27,5 +27,10 @@ public interface UserController {
      */
     public LoanOfferResponse getCustomerList();
 
+    /**
+     * login
+     * @param loginReq
+     * @return
+     */
     public LoanOfferResponse login(UserLoginReq loginReq);
 }
