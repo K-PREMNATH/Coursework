@@ -2,7 +2,9 @@ package com.dao.impl;
 
 import com.dao.OfferDAOConstant;
 import com.dao.OrderDAO;
+import com.dto.request.CreateOrderReq;
 import com.dto.request.GetOrderDetailReq;
+import com.dto.response.CommonResponse;
 import com.dto.response.GeneralResponse;
 import com.dto.response.GetOrderDetailRes;
 import com.dto.response.Product;
@@ -57,9 +59,9 @@ public class OrderDAOImpl implements OrderDAO {
     }
 
     @Override
-    public GetOrderDetailRes getOrderSingleCalculation(GetOrderDetailReq getOrderDetailReq) {
+    public CommonResponse getOrderSingleCalculation(GetOrderDetailReq getOrderDetailReq) {
         Long startTime = System.currentTimeMillis();
-        GetOrderDetailRes response = new GetOrderDetailRes();
+        CommonResponse response = new CommonResponse();
         Connection connection = null;
         CallableStatement callableStatement;
         try {
@@ -77,20 +79,69 @@ public class OrderDAOImpl implements OrderDAO {
             callableStatement.registerOutParameter(7, Types.VARCHAR);
             callableStatement.registerOutParameter(8, Types.DOUBLE);
 
+            callableStatement.registerOutParameter(9,Types.BOOLEAN);
+            callableStatement.registerOutParameter(10,Types.INTEGER);
+            callableStatement.registerOutParameter(11,Types.VARCHAR);
+
             callableStatement.execute();
             callableStatement.getResultSet();
-            response.setProductId(callableStatement.getInt(3));
-            response.setCategoryName(callableStatement.getString(4));
-            response.setBrandName(callableStatement.getString(5));
-            response.setQty(callableStatement.getInt(6));
-            response.setProductName(callableStatement.getString(7));
-            response.setSubTotal(callableStatement.getDouble(8));
+            response.setRes((Boolean) callableStatement.getObject(9));
+            response.setStatusCode((Integer) callableStatement.getObject(10));
+            response.setMsg((String) callableStatement.getObject(11));
 
+
+            if(response.isRes()){
+                GetOrderDetailRes getOrderDetailRes = new GetOrderDetailRes();
+                getOrderDetailRes.setProductId(callableStatement.getInt(3));
+                getOrderDetailRes.setCategoryName(callableStatement.getString(4));
+                getOrderDetailRes.setBrandName(callableStatement.getString(5));
+                getOrderDetailRes.setQty(callableStatement.getInt(6));
+                getOrderDetailRes.setProductName(callableStatement.getString(7));
+                getOrderDetailRes.setSubTotal(callableStatement.getDouble(8));
+
+                response.setValue(getOrderDetailRes);
+            }
         } catch (SQLException exception) {
             logger.info("An error occured in getOrderSingleCalculation " + exception.toString());
         } finally {
             DataSourceUtils.releaseConnection(connection, jdbcTemplate.getDataSource());
             logger.info("Time taken for getOrderSingleCalculation in seconds: " + (double) (System.currentTimeMillis() - startTime) / 1000);
+        }
+        return response;
+    }
+
+    @Override
+    public CommonResponse placeOrder(CreateOrderReq createOrderReq, String orderRequest) {
+        Long startTime = System.currentTimeMillis();
+        CommonResponse response = new CommonResponse();
+        Connection connection = null;
+        CallableStatement callableStatement;
+        try {
+            logger.info("placeOrder-request------------------>" + createOrderReq.toString());
+            logger.info("placeOrder-request------------------>" + orderRequest);
+
+            connection = DataSourceUtils.getConnection(jdbcTemplate.getDataSource());
+            callableStatement = connection.prepareCall(OfferDAOConstant.OrderConstant.CREATE_NEW_ORDER);
+            callableStatement.setObject(1, createOrderReq.getPaymentOption(), Types.INTEGER);
+            callableStatement.setObject(2, createOrderReq.getUserId(), Types.INTEGER);
+            callableStatement.setObject(3, orderRequest, Types.VARCHAR);
+
+
+            callableStatement.registerOutParameter(4,Types.BOOLEAN);
+            callableStatement.registerOutParameter(5,Types.INTEGER);
+            callableStatement.registerOutParameter(6,Types.VARCHAR);
+
+            callableStatement.execute();
+            callableStatement.getResultSet();
+            response.setRes((Boolean) callableStatement.getObject(4));
+            response.setStatusCode((Integer) callableStatement.getObject(5));
+            response.setMsg((String) callableStatement.getObject(6));
+
+        } catch (SQLException exception) {
+            logger.info("An error occured in placeOrder " + exception.toString());
+        } finally {
+            DataSourceUtils.releaseConnection(connection, jdbcTemplate.getDataSource());
+            logger.info("Time taken for placeOrder in seconds: " + (double) (System.currentTimeMillis() - startTime) / 1000);
         }
         return response;
     }
