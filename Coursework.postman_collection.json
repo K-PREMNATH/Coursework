@@ -13,7 +13,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"userId\": 0,\r\n    \"firstName\": \"TestFirst\",\r\n    \"lastName\": \"TestLast\",\r\n    \"dob\": \"01-01-2010\",\r\n    \"userType\": 2,\r\n    \"userName\": \"useradmin2\",\r\n    \"secretKey\": \"37427346\",\r\n    \"userEmail\": \"useradmin2@gmail.com\",\r\n    \"userMobileNumber\": \"3423423\",\r\n    \"nic\": \"354334\",\r\n    \"customerId\": 0,\r\n    \"loanBalance\": 15000,\r\n    \"usedAmount\": 0,\r\n    \"installPlan\": 1\r\n}",
+					"raw": "{\r\n    \"userId\": 0,\r\n    \"firstName\": \"Kathirkamanathan\",\r\n    \"lastName\": \"Premnath\",\r\n    \"dob\": \"01-01-2010\",\r\n    \"userType\": 1,\r\n    \"userName\": \"kpremnath\",\r\n    \"userEmail\": \"rexprem1991@gmail.com\",\r\n    \"userMobileNumber\": \"3423423\",\r\n    \"nic\": \"354334\",\r\n    \"customerId\": 0,\r\n    \"loanBalance\": 15000,\r\n    \"usedAmount\": 0,\r\n    \"installPlan\": 1\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -91,7 +91,13 @@
 			"name": "http://localhost:8080/user/login",
 			"request": {
 				"method": "POST",
-				"header": [],
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
 				"body": {
 					"mode": "raw",
 					"raw": "{\r\n    \"username\":\"kpremnath\",\r\n    \"password\":\"kwswxevu\"\r\n}",
@@ -144,7 +150,7 @@
 				"header": [],
 				"body": {
 					"mode": "raw",
-					"raw": "{\r\n    \"productId\":1,\r\n    \"qty\":2\r\n}",
+					"raw": "{\r\n    \"productId\":3,\r\n    \"qty\":2\r\n}",
 					"options": {
 						"raw": {
 							"language": "json"
@@ -163,6 +169,35 @@
 						"order",
 						"single",
 						"request"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "http://localhost:8080/create/order",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"orderDetail\":[\r\n        {\r\n            \"productId\":1,\r\n            \"qty\":2\r\n        },\r\n        {\r\n            \"productId\":2,\r\n            \"qty\":2\r\n        }\r\n    ],\r\n    \"paymentOption\":2,\r\n    \"userId\":7\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/create/order",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"create",
+						"order"
 					]
 				}
 			},
